@@ -2,6 +2,7 @@ package model
 
 type Command struct {
 	Type CommandType
+	Line int
 	Args interface{}
 }
 

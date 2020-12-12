@@ -17,7 +17,7 @@ var (
 	ErrNoEqual            = errors.New("no equal")
 	ErrNoConfig           = errors.New("no config")
 	ErrNoCommaConfig      = errors.New("no comma config")
-	ErrNotC               = errors.New("不是整数")
+	ErrNotInt             = errors.New("not int")
 	ErrEmptyKey           = errors.New("empty key")
 	ErrNotSupportKey      = errors.New("not support key")
 	ErrNotSupportOperator = errors.New("not support operator")
@@ -54,6 +54,8 @@ func ParseCommand(lineNumber int, source string) (*model.Command, error) {
 		return parseCommandInput(lineNumber, source)
 	case 'T':
 		return parseCommandTap(lineNumber, source)
+	case 'S':
+		return parseCommandSleep(lineNumber, source)
 	default:
 		log.Printf(errTemplate, "未知的操作类型", lineNumber, source)
 		return nil, ErrNotSupportOperator
@@ -78,15 +80,16 @@ func parseCommandMove(lineNumber int, source string) (*model.Command, error) {
 	x, err := strconv.Atoi(raws[0])
 	if err != nil {
 		log.Printf(errTemplate, "不是整数", lineNumber, source)
-		return nil, ErrNotC
+		return nil, ErrNotInt
 	}
 	y, err := strconv.Atoi(raws[0])
 	if err != nil {
 		log.Printf(errTemplate, "不是整数", lineNumber, source)
-		return nil, ErrNotC
+		return nil, ErrNotInt
 	}
 	return &model.Command{
 		Type: model.CommandTypeMove,
+		Line: lineNumber,
 		Args: model.MoveArgs{
 			X: x,
 			Y: y,
@@ -98,6 +101,7 @@ func parseCommandClick(lineNumber int, source string) (*model.Command, error) {
 	if len(source) == 1 {
 		return &model.Command{
 			Type: model.CommandTypeClick,
+			Line: lineNumber,
 			Args: model.ClickArgs{
 				Type:   model.ClickTypeLeft,
 				Double: false,
@@ -114,7 +118,7 @@ func parseCommandClick(lineNumber int, source string) (*model.Command, error) {
 		btn      = model.ClickTypeLeft
 	)
 	if len(raws) >= 2 {
-		if strings.EqualFold(raws[1], "true") {
+		if strings.EqualFold(raws[1], "double") {
 			isDouble = true
 		}
 	}
@@ -137,6 +141,7 @@ func parseCommandInput(lineNumber int, source string) (*model.Command, error) {
 	}
 	return &model.Command{
 		Type: model.CommandTypeInput,
+		Line: lineNumber,
 		Args: model.InputArgs{
 			Content: source[2:],
 		},
@@ -164,6 +169,7 @@ func parseCommandTap(lineNumber int, source string) (*model.Command, error) {
 		}
 		return &model.Command{
 			Type: model.CommandTypeTap,
+			Line: lineNumber,
 			Args: model.TapArgs{
 				CombineKeys: keys,
 				RepeatKeys:  nil,
@@ -185,7 +191,7 @@ func parseCommandTap(lineNumber int, source string) (*model.Command, error) {
 		count, err := strconv.Atoi(config[len(config)-1])
 		if err != nil {
 			log.Printf(errTemplate, "不是整数", lineNumber, source)
-			return nil, ErrNotC
+			return nil, ErrNotInt
 		}
 		var repeatKeys []string
 		for i := 0; i < count; i++ {
@@ -193,6 +199,7 @@ func parseCommandTap(lineNumber int, source string) (*model.Command, error) {
 		}
 		return &model.Command{
 			Type: model.CommandTypeTap,
+			Line: lineNumber,
 			Args: model.TapArgs{
 				CombineKeys: nil,
 				RepeatKeys:  repeatKeys,
@@ -205,9 +212,29 @@ func parseCommandTap(lineNumber int, source string) (*model.Command, error) {
 	}
 	return &model.Command{
 		Type: model.CommandTypeTap,
+		Line: lineNumber,
 		Args: model.TapArgs{
 			CombineKeys: []string{rawConfig},
 			RepeatKeys:  nil,
+		},
+	}, nil
+}
+
+func parseCommandSleep(lineNumber int, source string) (*model.Command, error) {
+	if len(source) < 3 {
+		log.Printf(errTemplate, "缺少等号", lineNumber, source)
+		return nil, ErrNoEqual
+	}
+	duration, err := strconv.Atoi(source[2:])
+	if err != nil {
+		log.Printf(errTemplate, "duration value not int", lineNumber, source)
+		return nil, ErrNotInt
+	}
+	return &model.Command{
+		Type: model.CommandTypeSleep,
+		Line: lineNumber,
+		Args: model.Sleep{
+			Duration: duration,
 		},
 	}, nil
 }
