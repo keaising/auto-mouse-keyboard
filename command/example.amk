@@ -1,0 +1,30 @@
+# 后面全是注释
+
+两条指令之间默认的停顿时间，单位 s
+SHIM=0.5
+
+# M move 鼠标移动
+M=100,300
+
+# C click 鼠标点击
+C
+C=left
+C=left,double
+C=right
+C=right,double
+
+# I input 键盘输入内容
+I=who's your daddy
+
+# T Tap 按键
+# 组合键用逗号分开
+T=ctrl,a
+# 方向键
+T=up
+# 如果有数字的话，数字代表次数
+T=up*10
+# 如果要输入十次 * 的话
+T=**10
+
+# S sleep 暂停，单位 s
+S=10
