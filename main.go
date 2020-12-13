@@ -13,14 +13,6 @@ import (
 	"github.com/keaising/auto-mouse-keyboard/model"
 )
 
-//tap("m", "cmd")
-//time.Sleep(2 * time.Second)
-//device.Click("right", false)
-//time.Sleep(2 * time.Second)
-//device.Click("left", false)
-//device.Input("fasjdfaks")
-//device.Tap("m", "cmd")
-
 func main() {
 	file, err := os.Open("amk.conf")
 	if err != nil {
