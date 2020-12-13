@@ -51,7 +51,9 @@ func ExecuteCommand(cmd *model.Command, com *model.Common) error {
 				device.Tap(args.CombineKeys...)
 			}
 			if len(args.RepeatKeys) != 0 {
-				device.Tap(args.RepeatKeys...)
+				for _, key := range args.RepeatKeys {
+					device.Tap(key)
+				}
 			}
 		}
 	case model.CommandTypeSleep:
