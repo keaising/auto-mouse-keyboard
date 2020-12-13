@@ -60,8 +60,8 @@ func ExecuteCommand(cmd *model.Command, com *model.Common) error {
 		{
 			args, ok := cmd.Args.(model.Sleep)
 			if !ok {
-				log.Println("wrong tap args", cmd)
-				return fmt.Errorf("wrong tap args %v", cmd)
+				log.Println("wrong sleep args", cmd)
+				return fmt.Errorf("wrong sleep args %v", cmd)
 			}
 			time.Sleep(time.Duration(args.Duration) * time.Second)
 		}
