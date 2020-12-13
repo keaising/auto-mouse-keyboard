@@ -40,6 +40,6 @@ type TapArgs struct {
 	RepeatKeys  []string
 }
 
-type Sleep struct {
+type SleepArgs struct {
 	Duration int
 }

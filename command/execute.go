@@ -58,7 +58,7 @@ func ExecuteCommand(cmd *model.Command, com *model.Common) error {
 		}
 	case model.CommandTypeSleep:
 		{
-			args, ok := cmd.Args.(model.Sleep)
+			args, ok := cmd.Args.(model.SleepArgs)
 			if !ok {
 				log.Println("wrong sleep args", cmd)
 				return fmt.Errorf("wrong sleep args %v", cmd)

@@ -233,7 +233,7 @@ func parseCommandSleep(lineNumber int, source string) (*model.Command, error) {
 	return &model.Command{
 		Type: model.CommandTypeSleep,
 		Line: lineNumber,
-		Args: model.Sleep{
+		Args: model.SleepArgs{
 			Duration: duration,
 		},
 	}, nil
