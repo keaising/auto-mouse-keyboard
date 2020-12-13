@@ -9,7 +9,7 @@ import (
 	"github.com/keaising/auto-mouse-keyboard/model"
 )
 
-func ExecuteCommand(cmd *model.Command) error {
+func ExecuteCommand(cmd *model.Command, com *model.Common) error {
 	log.Println(cmd.Type, cmd.Args)
 	switch cmd.Type {
 	case model.CommandTypeMove:
@@ -19,7 +19,7 @@ func ExecuteCommand(cmd *model.Command) error {
 				log.Println("wrong move args", cmd)
 				return fmt.Errorf("wrong move args %v", cmd)
 			}
-			device.Move(args.X, args.Y)
+			device.Move(args.X, args.Y, com.Scale)
 		}
 
 	case model.CommandTypeClick:

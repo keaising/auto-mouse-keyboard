@@ -7,7 +7,9 @@ import (
 
 const mouseMoveArg = 0.5
 
-func Move(x, y int) {
+func Move(x, y int, scale float64) {
+	x = int(float64(x) / scale)
+	y = int(float64(y) / scale)
 	robotgo.MoveMouseSmooth(x, y, mouseMoveArg, mouseMoveArg)
 }
 

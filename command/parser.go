@@ -42,7 +42,7 @@ func ParseCommands(sources []string) ([]*model.Command, error) {
 
 func ParseCommand(lineNumber int, source string) (*model.Command, error) {
 	source = strings.TrimSpace(source)
-	if source == "" || strings.HasPrefix(source, "#") || strings.HasPrefix(source, "SHIM"){
+	if source == "" || strings.HasPrefix(source, "#") || strings.HasPrefix(source, "SHIM") || strings.HasPrefix(source, "SCALE") {
 		return nil, nil
 	}
 	switch source[0] {
@@ -82,7 +82,7 @@ func parseCommandMove(lineNumber int, source string) (*model.Command, error) {
 		log.Printf(errTemplate, "不是整数", lineNumber, source)
 		return nil, ErrNotInt
 	}
-	y, err := strconv.Atoi(raws[0])
+	y, err := strconv.Atoi(raws[1])
 	if err != nil {
 		log.Printf(errTemplate, "不是整数", lineNumber, source)
 		return nil, ErrNotInt

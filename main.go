@@ -41,7 +41,7 @@ func main() {
 		return
 	}
 	for _, cmd := range commands {
-		if err = command.ExecuteCommand(cmd); err != nil {
+		if err = command.ExecuteCommand(cmd, common); err != nil {
 			log.Println("Execute command error!!! Please check and retry")
 			break
 		}
@@ -50,7 +50,7 @@ func main() {
 }
 
 func getCommon(sources []string) (*model.Common, error) {
-	var common   model.Common
+	var common model.Common
 
 	for _, source := range sources {
 		source = strings.TrimSpace(source)
@@ -68,6 +68,19 @@ func getCommon(sources []string) (*model.Common, error) {
 				return nil, fmt.Errorf("shim value not int %v", err)
 			}
 			common.Shim = shim
+			continue
+		}
+		if strings.HasPrefix(source, "SCALE") {
+			if len(source) < 3 {
+				log.Println("no scale value")
+				return nil, fmt.Errorf("no scale value")
+			}
+			scale, err := strconv.ParseFloat(source[6:], 64)
+			if err != nil {
+				log.Println("scale value not float64", err)
+				return nil, fmt.Errorf("scale value not float64 %v", err)
+			}
+			common.Scale = scale
 			continue
 		}
 	}
