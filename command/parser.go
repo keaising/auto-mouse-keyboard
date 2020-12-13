@@ -42,7 +42,7 @@ func ParseCommands(sources []string) ([]*model.Command, error) {
 
 func ParseCommand(lineNumber int, source string) (*model.Command, error) {
 	source = strings.TrimSpace(source)
-	if source == "" || strings.HasPrefix(source, "#") {
+	if source == "" || strings.HasPrefix(source, "#") || strings.HasPrefix(source, "SHIM"){
 		return nil, nil
 	}
 	switch source[0] {

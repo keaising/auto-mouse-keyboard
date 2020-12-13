@@ -38,7 +38,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	sources, common, err := getCommon(sources)
+	common, err := getCommon(sources)
 	if err != nil {
 		log.Println("Get common value error, please check and retry")
 		return
@@ -57,11 +57,8 @@ func main() {
 	}
 }
 
-func getCommon(sources []string) ([]string, *model.Common, error) {
-	var (
-		filtered []string
-		common   model.Common
-	)
+func getCommon(sources []string) (*model.Common, error) {
+	var common   model.Common
 
 	for _, source := range sources {
 		source = strings.TrimSpace(source)
@@ -71,17 +68,16 @@ func getCommon(sources []string) ([]string, *model.Common, error) {
 		if strings.HasPrefix(source, "SHIM") {
 			if len(source) < 3 {
 				log.Println("no shim value")
-				return nil, nil, fmt.Errorf("no shim value")
+				return nil, fmt.Errorf("no shim value")
 			}
 			shim, err := strconv.Atoi(source[5:])
 			if err != nil {
 				log.Println("shim value not int", err)
-				return nil, nil, fmt.Errorf("shim value not int %v", err)
+				return nil, fmt.Errorf("shim value not int %v", err)
 			}
 			common.Shim = shim
 			continue
 		}
-		filtered = append(filtered, source)
 	}
-	return filtered, &common, nil
+	return &common, nil
 }

@@ -3,12 +3,14 @@ package command
 import (
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/keaising/auto-mouse-keyboard/device"
 	"github.com/keaising/auto-mouse-keyboard/model"
 )
 
 func ExecuteCommand(cmd *model.Command) error {
+	log.Println(cmd.Type, cmd.Args)
 	switch cmd.Type {
 	case model.CommandTypeMove:
 		{
@@ -51,6 +53,15 @@ func ExecuteCommand(cmd *model.Command) error {
 			if len(args.RepeatKeys) != 0 {
 				device.Tap(args.RepeatKeys...)
 			}
+		}
+	case model.CommandTypeSleep:
+		{
+			args, ok := cmd.Args.(model.Sleep)
+			if !ok {
+				log.Println("wrong tap args", cmd)
+				return fmt.Errorf("wrong tap args %v", cmd)
+			}
+			time.Sleep(time.Duration(args.Duration) * time.Second)
 		}
 	}
 	return nil
