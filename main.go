@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -49,40 +50,81 @@ func main() {
 	}
 }
 
+var commonItems = []model.CommonItem{
+	{
+		Name: "SHIM",
+		Type: model.CommonItemTypeInt,
+	},
+	{
+		Name: "SCALE",
+		Type: model.CommonItemTypeFloat64,
+	},
+}
+
 func getCommon(sources []string) (*model.Common, error) {
-	var common model.Common
+	var (
+		common model.Common
+		kv     = make(map[string]interface{})
+	)
 
 	for _, source := range sources {
 		source = strings.TrimSpace(source)
 		if source == "" || strings.HasPrefix(source, "#") {
 			continue
 		}
-		if strings.HasPrefix(source, "SHIM") {
-			if len(source) < 3 {
-				log.Println("no shim value")
-				return nil, fmt.Errorf("no shim value")
+		for _, item := range commonItems {
+			if strings.HasPrefix(source, item.Name) {
+				if len(source) < len(item.Name)+1 {
+					log.Println("no value of", item.Name)
+					return nil, fmt.Errorf("no value of %s", item.Name)
+				}
+				v, err := getValueOfConfig(source, item)
+				if err != nil {
+					return nil, err
+				}
+				kv[item.Name] = v
 			}
-			shim, err := strconv.Atoi(source[5:])
-			if err != nil {
-				log.Println("shim value not int", err)
-				return nil, fmt.Errorf("shim value not int %v", err)
-			}
-			common.Shim = shim
-			continue
 		}
-		if strings.HasPrefix(source, "SCALE") {
-			if len(source) < 3 {
-				log.Println("no scale value")
-				return nil, fmt.Errorf("no scale value")
-			}
-			scale, err := strconv.ParseFloat(source[6:], 64)
-			if err != nil {
-				log.Println("scale value not float64", err)
-				return nil, fmt.Errorf("scale value not float64 %v", err)
-			}
-			common.Scale = scale
-			continue
+		// 通过序列化达到 map => struct 的目的
+		data, err := json.Marshal(kv)
+		if err != nil {
+			log.Println("marshal kv failed", err)
+			return nil, fmt.Errorf("marshal kv failed %v", err)
+		}
+		err = json.Unmarshal(data, &common)
+		if err != nil {
+			log.Println("unmarshal kv failed", err)
+			return nil, fmt.Errorf("unmarshal kv failed %v", err)
 		}
 	}
 	return &common, nil
+}
+
+// 将配置里的值转化为 common 里的对应的值
+func getValueOfConfig(source string, item model.CommonItem) (interface{}, error) {
+	rawValue := source[(len(item.Name) - 1):]
+	switch item.Type {
+	case model.CommonItemTypeInt:
+		{
+			v, err := strconv.Atoi(rawValue)
+			if err != nil {
+				log.Println(item.Name, "value not int", err)
+				return nil, fmt.Errorf("%s value not int %v", item.Name, err)
+			}
+			return v, nil
+		}
+	case model.CommonItemTypeFloat64:
+		{
+			v, err := strconv.ParseFloat(rawValue, 64)
+			if err != nil {
+				log.Println(item.Name, "value not float64", err)
+				return nil, fmt.Errorf("%s value not float64 %v", item.Name, err)
+			}
+			return v, nil
+		}
+	case model.CommonItemTypeString:
+		fallthrough
+	default:
+		return rawValue, nil
+	}
 }
