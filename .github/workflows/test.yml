@@ -1,4 +1,4 @@
-on: [push, pull_request]
+on: push
 
 name: Test and build
 
@@ -61,6 +61,31 @@ jobs:
           ls
           mkdir release
           mv amk-windows.exe release
+
+      - name: Test
+        run: go test -v ./...
+
+  build-macos:
+    name: build-macOS
+    runs-on: macOS-latest
+    steps:
+      - name: Set up Go 1.x
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.15
+
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
+
+      - name: Get dependencies
+        run: |
+          go get -v -t -d ./...
+
+      - name: Build
+        run: |
+          go build -o amk-macos
+          mkdir release
+          mv amk-macos release
 
       - name: Test
         run: go test -v ./...
