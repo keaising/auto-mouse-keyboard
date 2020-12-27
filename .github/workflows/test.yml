@@ -1,3 +1,7 @@
+on: [push, pull_request]
+
+name: Test and build
+
 jobs:
   build-linux:
     name: build-linux
