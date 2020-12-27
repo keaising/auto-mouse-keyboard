@@ -98,7 +98,7 @@ func ExecuteCommand(cmd *model.Command, com *model.Common) error {
 				log.Println("wrong sleep args", cmd)
 				return fmt.Errorf("wrong sleep args %v", cmd)
 			}
-			time.Sleep(time.Duration(args.Duration) * time.Second)
+			time.Sleep(time.Duration(args.Duration) * time.Millisecond)
 		}
 	case model.CommandTypeLoop:
 		{

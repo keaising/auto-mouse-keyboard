@@ -14,7 +14,6 @@ const (
 	CommandTypeInput            CommandType = "input"
 	CommandTypeTap              CommandType = "tap"
 	CommandTypeSleep            CommandType = "sleep"
-	CommandTypeMillisecondSleep CommandType = "millisecond_sleep"
 	CommandTypeLoop             CommandType = "loop"
 )
 
