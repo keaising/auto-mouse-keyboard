@@ -9,6 +9,41 @@ import (
 	"github.com/keaising/auto-mouse-keyboard/model"
 )
 
+func RunCommand(cmds []*model.Command, com *model.Common) error {
+	var toBeRunCommands []*model.Command
+	for i := 0; i < len(cmds); i++ {
+		if cmds[i].Type != model.CommandTypeLoop {
+			toBeRunCommands = append(toBeRunCommands, cmds[i])
+			continue
+		}
+		cmdArgs, ok := cmds[i].Args.(model.LoopArgs)
+		if !ok {
+			log.Println("wrong loop args", cmds[i])
+			return fmt.Errorf("wrong loop args %v", cmds[i])
+		}
+		var loopCommands []*model.Command
+		for j := i + 1; j < len(cmds); j++ {
+			if cmds[j].Type != model.CommandTypeLoop {
+				loopCommands = append(loopCommands, cmds[j])
+			} else {
+				i = j
+				break
+			}
+		}
+		cmdArgs.Commands = loopCommands
+		cmds[i].Args = cmdArgs
+		toBeRunCommands = append(toBeRunCommands, cmds[i])
+	}
+	for _, cmd := range toBeRunCommands {
+		if err := ExecuteCommand(cmd, com); err != nil {
+			log.Println("Execute command error!!! Please check and retry")
+			return err
+		}
+		time.Sleep(time.Duration(com.Shim) * time.Millisecond)
+	}
+	return nil
+}
+
 func ExecuteCommand(cmd *model.Command, com *model.Common) error {
 	log.Println(cmd.Type, cmd.Args)
 	switch cmd.Type {
@@ -64,6 +99,23 @@ func ExecuteCommand(cmd *model.Command, com *model.Common) error {
 				return fmt.Errorf("wrong sleep args %v", cmd)
 			}
 			time.Sleep(time.Duration(args.Duration) * time.Second)
+		}
+	case model.CommandTypeLoop:
+		{
+			args, ok := cmd.Args.(model.LoopArgs)
+			if !ok {
+				log.Println("wrong loop args", cmd)
+				return fmt.Errorf("wrong loop args %v", cmd)
+			}
+			for i := 0; i < args.Times; i++ {
+				for j, c := range args.Commands {
+					if err := ExecuteCommand(c, com); err != nil {
+						log.Println("execute loop command", i, j, c)
+						return fmt.Errorf("execute loop command %d %d %v", i, j, c)
+					}
+					time.Sleep(time.Duration(com.Shim) * time.Millisecond)
+				}
+			}
 		}
 	}
 	return nil

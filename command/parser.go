@@ -56,6 +56,8 @@ func ParseCommand(lineNumber int, source string) (*model.Command, error) {
 		return parseCommandTap(lineNumber, source)
 	case 'S':
 		return parseCommandSleep(lineNumber, source)
+	case 'L':
+		return parseCommandLoop(lineNumber, source)
 	default:
 		log.Printf(errTemplate, "未知的操作类型", lineNumber, source)
 		return nil, ErrNotSupportOperator
@@ -235,6 +237,30 @@ func parseCommandSleep(lineNumber int, source string) (*model.Command, error) {
 		Line: lineNumber,
 		Args: model.SleepArgs{
 			Duration: duration,
+		},
+	}, nil
+}
+
+func parseCommandLoop(lineNumber int, source string) (*model.Command, error) {
+	if len(source) < 3 {
+		return &model.Command{
+			Type: model.CommandTypeLoop,
+			Line: lineNumber,
+			Args: model.LoopArgs{
+				Times: 0,
+			},
+		}, nil
+	}
+	times, err := strconv.Atoi(source[2:])
+	if err != nil {
+		log.Printf(errTemplate, "times value not int", lineNumber, source)
+		return nil, ErrNotInt
+	}
+	return &model.Command{
+		Type: model.CommandTypeLoop,
+		Line: lineNumber,
+		Args: model.LoopArgs{
+			Times: times,
 		},
 	}, nil
 }

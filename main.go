@@ -8,7 +8,6 @@ import (
 	"os"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/keaising/auto-mouse-keyboard/command"
 	"github.com/keaising/auto-mouse-keyboard/model"
@@ -41,13 +40,7 @@ func main() {
 		log.Println("ERROR! correct amk.conf and run again")
 		return
 	}
-	for _, cmd := range commands {
-		if err = command.ExecuteCommand(cmd, common); err != nil {
-			log.Println("Execute command error!!! Please check and retry")
-			break
-		}
-		time.Sleep(time.Duration(common.Shim) * time.Millisecond)
-	}
+	_ = command.RunCommand(commands, common)
 }
 
 var commonItems = []model.CommonItem{
@@ -102,7 +95,7 @@ func getCommon(sources []string) (*model.Common, error) {
 
 // 将配置里的值转化为 common 里的对应的值
 func getValueOfConfig(source string, item model.CommonItem) (interface{}, error) {
-	rawValue := source[(len(item.Name) - 1):]
+	rawValue := source[(len(item.Name) + 1):]
 	switch item.Type {
 	case model.CommonItemTypeInt:
 		{
