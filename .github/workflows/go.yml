@@ -1,4 +1,4 @@
-name: Go
+name: Package
 
 on:
   push:
@@ -20,6 +20,10 @@ jobs:
 
     - name: Check out code into the Go module directory
       uses: actions/checkout@v2
+
+    - name: install dependencies
+      run: |
+        sudo apt-get install xcb libxcb-xkb-dev x11-xkb-utils libx11-xcb-dev libxkbcommon-x11-dev libx11-dev
 
     - name: Get dependencies
       run: |
