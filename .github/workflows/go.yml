@@ -2,88 +2,132 @@ name: Package
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
-
-  ubuntu-build:
-    name: ubuntu-build
+  build-linux:
+    name: build-linux
     runs-on: ubuntu-latest
     steps:
+      - name: Set up Go 1.x
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.15
 
-    - name: Set up Go 1.x
-      uses: actions/setup-go@v2
-      with:
-        go-version: 1.15
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
 
-    - name: Check out code into the Go module directory
-      uses: actions/checkout@v2
+      - name: Install dependencies
+        run: |
+          sudo apt install gcc libc6-dev
+          sudo apt install libx11-dev xorg-dev libxtst-dev libpng++-dev
+          sudo apt install xcb libxcb-xkb-dev x11-xkb-utils libx11-xcb-dev libxkbcommon-x11-dev
+          sudo apt install libxkbcommon-dev
+          sudo apt install xsel xclip
 
-    - name: Install dependencies
-      run: |
-        sudo apt install gcc libc6-dev
-        sudo apt install libx11-dev xorg-dev libxtst-dev libpng++-dev
-        sudo apt install xcb libxcb-xkb-dev x11-xkb-utils libx11-xcb-dev libxkbcommon-x11-dev
-        sudo apt install libxkbcommon-dev
-        sudo apt install xsel xclip
+      - name: Get dependencies
+        run: |
+          go get -v -t -d ./...
 
-    - name: Get dependencies
-      run: |
-        go get -v -t -d ./...
+      - name: Build
+        run: |
+          go build -o amk-linux-amd64
+          chmod a+x ./amk-linux-amd64
+          tar -czvf amk-linux-amd64.tar.gz ./amk-linux-amd64
+          ls -al
+          mkdir release
+          mv amk-linux-amd64.tar.gz release
 
-    - name: Build
-      run: |
-        go build -o amk
-        chmod a+x ./amk
-        tar -czvf amk-linux-amd64.tar.gz ./amk
-        ls -al
-        mkdir release
-        mv amk-linux-amd64.tar.gz release
+      - name: Test
+        run: go test -v ./...
 
-    - name: Test
-      run: go test -v ./...
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v1
+        with:
+          name: latest-linux
+          path: release
 
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v1
-      with:
-        name: latest-linux
-        path: release
-
-  windows-build:
-    name: windows-build
+  build-windows:
+    name: build-windows
     runs-on: windows-latest
     steps:
+      - name: Set up Go 1.x
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.15
 
-    - name: Set up Go 1.x
-      uses: actions/setup-go@v2
-      with:
-        go-version: ^1.13
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
 
-    - name: Check out code into the Go module directory
-      uses: actions/checkout@v2
+      - name: Get dependencies
+        run: |
+          go get -v -t -d ./...
 
-    - name: install dependencies
-      run: |
-        ls
+      - name: Build
+        run: |
+          go build -o amk-windows.exe
+          ls
+          mkdir release
+          mv amk-windows.exe release
 
-    - name: Get dependencies
-      run: |
-        go get -v -t -d ./...
+      - name: Test
+        run: go test -v ./...
 
-    - name: Build
-      run: |
-        go build -o amk-windows.exe
-        ls
-        mkdir release
-        mv amk-windows.exe release
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v1
+        with:
+          name: latest-windows
+          path: release
 
-    - name: Test
-      run: go test -v ./...
+  release:
+    name: Create and upload release
+    needs: [build-linux, build-windows]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download linux artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: latest-linux 
     
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v1
-      with:
-        name: latest-windows
-        path: release
+      - name: Download windows artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: latest-windows 
+      
+      - name: Zip windows
+        run: |
+          ls -al
+          zip amk-windows.zip amk-windows.exe
+      
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+      - name: Upload windows
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with: 
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./amk-windows.zip
+          asset_name: amk-windows.zip
+          asset_content_type: application/zip
+
+      - name: Upload linux
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./amk-linux-amd64.tar.gz
+          asset_name: amk-linux-amd64.tar.gz
+          asset_content_type: application/gzip
