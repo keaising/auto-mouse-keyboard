@@ -14,6 +14,11 @@ import (
 )
 
 func main() {
+	if len(os.Args) > 1 {
+		log.Println("specific file", os.Args[1])
+		readFileAndRun(os.Args[1])
+		return
+	}
 	file, err := os.Open(".")
 	if err != nil {
 		log.Fatalln("fail opening directory")
@@ -30,7 +35,7 @@ func main() {
 }
 
 func readFileAndRun(fileName string) {
-	file, err := os.Open("amk.conf")
+	file, err := os.Open(fileName)
 	if err != nil {
 		log.Fatal(err)
 	}
