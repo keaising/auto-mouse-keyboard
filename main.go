@@ -14,6 +14,22 @@ import (
 )
 
 func main() {
+	file, err := os.Open(".")
+	if err != nil {
+		log.Fatalln("fail opening directory")
+	}
+	list, err := file.Readdirnames(0)
+	if err != nil {
+		log.Fatalln("fail read directory")
+	}
+	for _, name := range list {
+		if strings.HasSuffix(name, ".conf") {
+			readFileAndRun(name)
+		}
+	}
+}
+
+func readFileAndRun(fileName string) {
 	file, err := os.Open("amk.conf")
 	if err != nil {
 		log.Fatal(err)
@@ -41,6 +57,7 @@ func main() {
 		return
 	}
 	_ = command.RunCommand(commands, common)
+
 }
 
 var commonItems = []model.CommonItem{
