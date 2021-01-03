@@ -1,7 +1,7 @@
 on:
   push:
     tags:
-    - 'v[0-9]+.[0-9]+.[0-9]*'
+      - "v[0-9]+.[0-9]+.[0-9]*"
 
 name: Create release and upload binaries
 
@@ -66,10 +66,10 @@ jobs:
 
       - name: Build
         run: |
-          go build -o amk-windows.exe
+          go build -o amk.exe
           ls
           mkdir release
-          mv amk-windows.exe release
+          mv amk.exe release
 
       - name: Test
         run: go test -v ./...
@@ -120,24 +120,24 @@ jobs:
       - name: Download linux artifacts
         uses: actions/download-artifact@v2
         with:
-          name: latest-linux 
-    
+          name: latest-linux
+
       - name: Download windows artifacts
         uses: actions/download-artifact@v2
         with:
-          name: latest-windows 
-      
+          name: latest-windows
+
       - name: Download macOS artifacts
         uses: actions/download-artifact@v2
         with:
-          name: latest-macos 
-      
+          name: latest-macos
+
       - name: Zip windows
         run: |
           ls -al
-          zip amk-windows.zip amk-windows.exe
+          zip amk-windows.zip amk.exe
           zip amk-macos.zip amk-macos
-      
+
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -153,7 +153,7 @@ jobs:
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with: 
+        with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./amk-windows.zip
           asset_name: amk-windows.zip
@@ -173,7 +173,7 @@ jobs:
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with: 
+        with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./amk-macos.zip
           asset_name: amk-macos.zip
