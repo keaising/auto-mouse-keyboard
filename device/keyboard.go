@@ -15,14 +15,14 @@ func Tap(keys ...string) {
 		return
 	}
 	if len(keys) == 1 {
-		result := robotgo.KeyTap(keys[0])
-		if len(result) != 0 {
-			log.Println("tap result:", result)
+		err := robotgo.KeyTap(keys[0])
+		if err != nil {
+			log.Println("tap result:", err)
 		}
 		return
 	}
-	result := robotgo.KeyTap(keys[0], keys[1:])
-	if len(result) != 0 {
-		log.Println("tap result:", result)
+	err := robotgo.KeyTap(keys[0], keys[1:])
+	if err != nil {
+		log.Println("tap result:", err)
 	}
 }

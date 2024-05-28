@@ -21,10 +21,12 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt install gcc libc6-dev
-          sudo apt install libx11-dev xorg-dev libxtst-dev libpng++-dev
-          sudo apt install xcb libxcb-xkb-dev x11-xkb-utils libx11-xcb-dev libxkbcommon-x11-dev
-          sudo apt install libxkbcommon-dev
+          sudo apt install libx11-dev xorg-dev libxtst-dev
           sudo apt install xsel xclip
+          sudo apt install libpng++-dev
+          sudo apt install xcb libxcb-xkb-dev x11-xkb-utils libx11-xcb-dev libxkbcommon-x11-dev libxkbcommon-dev
+          # for Arch
+          # sudo pacman -S gcc glibc libx11 libxtst xsel xclip libpng xcb-util libxcb xorg-xkbutils libx11 libxkbcommon-x11 libxkbcommon
 
       - name: Get dependencies
         run: |
