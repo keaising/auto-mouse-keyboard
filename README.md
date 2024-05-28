@@ -1,71 +1,73 @@
 # auto-mouse-keyboard
 
-## 使用
+## Usage
 
-1. 在 Release 页面下载得到 exe 文件，将下载文件随意放到一个目录下
-2. 在同目录添加一个文本文件，名字是 amk.conf
-3. 在资源管理器地址栏输入 powershell
-4. 在弹出的新窗口中输入 .\auto-mouse-keyboard.exe 即可开始运行
+1. Download exe file into an abtrary directory
+2. Create a config file named `amk.conf` with config you need
+3. Input `powershell` in Explorer to start `pwsh.exe`
+4. Start amk with input `.\amk.exe` in the new window
 
-备注
+Warning:
 
-- v1.3.0 以后的版本会执行当前目录下所有以 `.conf` 结尾的配置文件
+- All config with a suffix of `.conf` will be executed in the directory
 
-## 配置文件 amk.conf 格式说明
+## Description of `amk.conf`
 
-配置文件的名字无所谓，只要是以 `.conf` 结尾即可
+All valid names are allowed, as long as the config end with `.conf` extension
 
-配置文件中每行是一条指令，指令分为 3 类：注释、设置和流程
+Every line is a command, with three types: comment, setting and process
 
-### 注释指令
+### Comment
 
-开头第一个字符是 `#` 的都是注释，比如
+Comment start with `#`, e.g.:
 
 ```bash
 # This is a comment
 ```
 
-如果一行什么都不写，或者全都写空格，那就是空指令，什么都不会影响也不会有任何作用
+Comments line, an empty line and a line with all whitespace are all empty lines, these lines will be ignored
 
-### 设置指令
+### Setting
 
-目前只有两个设置，设置每条命令执行的时间间隔(SHIM，单位毫秒)和设置当前显示器的分辨率缩放(SCALE)
+- `SHIM`: A very short time to suspend between two commands, in Millisecond
+- `SCALE`: Scale for your monitor, keep the same with your system settings
 
-下面设置中，第一行设置两条命令之间间隔 500 毫秒执行，第二行标示当前显示器的分辨率缩放了 150%
+In the settings below, the second command will delay 500ms after the first command finished, and the monitor scale 150%
 
 ```conf
 SHIM=500
 SCALE=1.5
 ```
 
-分辨率缩放主要是影响鼠标移动位置，在高分屏中会需要用到，当你发现鼠标移动的实际位置跟设定的位置不一致的时候需要检查，不设置的话默认是 1，没有缩放
+### Process
 
-### 流程指令
+There are six types:
 
-流程分为 6 类
+- Mouse move
+- Mouse click
+- Keyboard Input
+- Keyboard Press
+- Suspend
+- Loop
 
-- 鼠标移动
-- 鼠标点击
-- 键盘输入
-- 键盘按键
-- 暂停
-- 循环
+**Mouse move**
 
-**鼠标移动**
+Say, we have a monitor with display 1920\*1080, left up point is (0,0), right bottom point is (1920,1080)
 
-以一个分辨率为 1920\*1080 的屏幕为例，左上角坐标为(0,0)，右下角坐标为(1920,1080)
-
-将鼠标移动到屏幕坐标 (300,200) 的位置
+We want to move cursor to the point (300,200)
 
 ```bash
 M=300,200
 ```
 
-**鼠标点击**
+**Mouse click**
 
-在当前位置点击鼠标
+Click in current position
 
-第一行：左键单击，第二行：左键双击，第三行：右键单击，第四行：右键双击
+1. Left single click
+2. Left double click
+3. Right single click
+4. Right double click
 
 ```conf
 C=left
@@ -74,26 +76,26 @@ C=right
 C=right,double
 ```
 
-**键盘输入**
+**Keyboard Input**
 
-在当前位置输入文本
+Input any content in current position (Must be an input box)
 
 ```conf
 I=23333
-I=可以是中文，也可以是 I love Grace
-I=%^*(&())(
-I=可以包含各种特殊符号，也可以   有空格
+I=Content can be English, also 中文
+I=%^*(&())(  special chars are support
+I=And Even whitespace
 ```
 
-**键盘按键**
+**Keyboard press**
 
-可以是单个按键，也可以是组合键
+Press can be single press and compound press
 
-单个按键包括 `a-z`、 `0-9`和以及普通的功能键
+Single press: `a-z` / `0-9` and normal function keys
 
-同时也可以使用组合键，比如耳熟能详的 `Ctrl+C`/ `Ctrl+V`
+Compound press can be any types, say `Ctrl+C`/ `Ctrl+V`
 
-所有支持的按键列表见 [https://github.com/go-vgo/robotgo/blob/master/docs/keys.md](https://github.com/go-vgo/robotgo/blob/master/docs/keys.md)
+All supported keys can be found at: [https://github.com/go-vgo/robotgo/blob/master/docs/keys.md](https://github.com/go-vgo/robotgo/blob/master/docs/keys.md)
 
 ```conf
 T=1
@@ -105,7 +107,7 @@ T=d,cmd
 T=e,cmd
 ```
 
-下面只是列举常用的功能键
+Some examples:
 
 ```bash
 	"cmd"		is the "win" key for windows
@@ -143,11 +145,11 @@ T=e,cmd
 	"f12"
 ```
 
-**暂停**
+**Suspend**
 
-手动控制两个操作之间的间隔，真正的间隔会变成 (SHIM+S)毫秒，暂停的单位是毫秒
+Increase the delay, the actual delay will be (SHIM+S)ms
 
-比如配置里 `SHIM=400`，脚本如下
+If settings contains `SHIM=400` with config:
 
 ```conf
 T=enter
@@ -155,13 +157,11 @@ S=300
 I=wow
 ```
 
-那么，摁下回车和输入 `wow`之间的真实间隔是 `SHIM+S+SHIM=400+300+400=1100 ms`
+The delay between enter and input `wow` will be `SHIM+S+SHIM=400+300+400=1100 ms`
 
-需要注意，使用组合键的时候，数字和字母需要放前面，功能键（比如 cmd/ctrl/shift）需要放后面，用逗号分隔开
+**Loop**
 
-**循环**
-
-使一个片段反复执行 N 次，比如下列的语句
+Loop a slice of comamnds for N times:
 
 ```conf
 S=2000
@@ -177,12 +177,12 @@ L
 I= done
 ```
 
-首先暂停 2000ms，左键点击一次，输入 `begin`，然后开始循环
+Suspend 2000ms, then click, then input text `begin`, and the loop begins.
 
-在每次循环里，首先左键点击一次，输入 `wow`，然后摁 3 次回车
+In every loop, click left, then input text `wow`, then three ENTER will be pressed
 
-3 次循环结束后，输入 `done`
+After three loops done, input `done`
 
-两个 L 必须成对出现，否则最后一个单个 L 到结尾的内容会全部循环
+`L` must be in pairs, or the commands between the last `L` to the end of config will be looped
 
-成对出现的 L 以第一个 L 的次数为执行次数，不写就是 0 次
+The number in the first of the paired `L` will be the times to be executed, empty will be zero

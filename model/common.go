@@ -1,7 +1,7 @@
 package model
 
 type Common struct {
-	// 两条指令之间的暂停时间
+	// A very short time to suspend between two commands
 	Shim  int     `json:"SHIM"`
 	Scale float64 `json:"SCALE"`
 }
@@ -12,7 +12,7 @@ const (
 	CommonItemTypeString  = "string"
 )
 
-// 标注每条配置的名字和类型，需要反序列化到 Common 上
+// CommonItem: Metadata of config
 type CommonItem struct {
 	Name string
 	Type string

@@ -56,7 +56,6 @@ func ExecuteCommand(cmd *model.Command, com *model.Common) error {
 			}
 			device.Move(args.X, args.Y, com.Scale)
 		}
-
 	case model.CommandTypeClick:
 		{
 			args, ok := cmd.Args.(model.ClickArgs)

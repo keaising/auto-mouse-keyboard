@@ -1,6 +1,7 @@
 on:
   push:
     branches:
+      - master
 
 name: Test and build
 

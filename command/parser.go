@@ -66,27 +66,27 @@ func ParseCommand(lineNumber int, source string) (*model.Command, error) {
 
 func parseCommandMove(lineNumber int, source string) (*model.Command, error) {
 	if len(source) < 3 || source[1] != '=' {
-		log.Printf(errTemplate, "缺少等号", lineNumber, source)
+		log.Printf(errTemplate, "missed = ", lineNumber, source)
 		return nil, ErrNoEqual
 	}
 	var rawConfig = source[2:]
 	if len(rawConfig) == 0 {
-		log.Printf(errTemplate, "缺少配置项", lineNumber, source)
+		log.Printf(errTemplate, "missed config", lineNumber, source)
 		return nil, ErrNoConfig
 	}
 	var raws = strings.Split(rawConfig, ",")
 	if len(raws) != 2 {
-		log.Printf(errTemplate, "缺少逗号分割的配置", lineNumber, source)
+		log.Printf(errTemplate, "missed config with comma", lineNumber, source)
 		return nil, ErrNoCommaConfig
 	}
 	x, err := strconv.Atoi(raws[0])
 	if err != nil {
-		log.Printf(errTemplate, "不是整数", lineNumber, source)
+		log.Printf(errTemplate, "must be an integer", lineNumber, source)
 		return nil, ErrNotInt
 	}
 	y, err := strconv.Atoi(raws[1])
 	if err != nil {
-		log.Printf(errTemplate, "不是整数", lineNumber, source)
+		log.Printf(errTemplate, "must be an integer", lineNumber, source)
 		return nil, ErrNotInt
 	}
 	return &model.Command{
@@ -111,7 +111,7 @@ func parseCommandClick(lineNumber int, source string) (*model.Command, error) {
 		}, nil
 	}
 	if len(source) < 3 {
-		log.Printf(errTemplate, "缺少配置项", lineNumber, source)
+		log.Printf(errTemplate, "missed config", lineNumber, source)
 		return nil, ErrNoConfig
 	}
 	var (
@@ -138,7 +138,7 @@ func parseCommandClick(lineNumber int, source string) (*model.Command, error) {
 
 func parseCommandInput(lineNumber int, source string) (*model.Command, error) {
 	if len(source) < 3 || source[1] != '=' {
-		log.Printf(errTemplate, "缺少等号", lineNumber, source)
+		log.Printf(errTemplate, "missed equal = ", lineNumber, source)
 		return nil, ErrNoEqual
 	}
 	return &model.Command{
@@ -152,7 +152,7 @@ func parseCommandInput(lineNumber int, source string) (*model.Command, error) {
 
 func parseCommandTap(lineNumber int, source string) (*model.Command, error) {
 	if len(source) < 3 || source[1] != '=' {
-		log.Printf(errTemplate, "缺少等号", lineNumber, source)
+		log.Printf(errTemplate, "missed equal = ", lineNumber, source)
 		return nil, ErrNoEqual
 	}
 	var rawConfig = strings.TrimSpace(source[2:])
@@ -161,11 +161,11 @@ func parseCommandTap(lineNumber int, source string) (*model.Command, error) {
 		for _, key := range keys {
 			key = strings.TrimSpace(key)
 			if key == "" {
-				log.Printf(errTemplate, "有空按键", lineNumber, source)
+				log.Printf(errTemplate, "please remove empty key", lineNumber, source)
 				return nil, ErrEmptyKey
 			}
 			if _, ok := robotgo.Keycode[key]; !ok {
-				log.Printf(errTemplate, fmt.Sprintf("不支持该按键：%s", key), lineNumber, source)
+				log.Printf(errTemplate, fmt.Sprintf("not supported key：%s", key), lineNumber, source)
 				return nil, ErrNotSupportKey
 			}
 		}
@@ -187,12 +187,12 @@ func parseCommandTap(lineNumber int, source string) (*model.Command, error) {
 			key = strings.TrimSpace(config[0])
 		}
 		if _, ok := robotgo.Keycode[key]; !ok {
-			log.Printf(errTemplate, fmt.Sprintf("不支持该按键：%s", key), lineNumber, source)
+			log.Printf(errTemplate, fmt.Sprintf("not supported key: s", key), lineNumber, source)
 			return nil, ErrNotSupportKey
 		}
 		count, err := strconv.Atoi(config[len(config)-1])
 		if err != nil {
-			log.Printf(errTemplate, "不是整数", lineNumber, source)
+			log.Printf(errTemplate, "must be an integer", lineNumber, source)
 			return nil, ErrNotInt
 		}
 		var repeatKeys []string
@@ -209,7 +209,7 @@ func parseCommandTap(lineNumber int, source string) (*model.Command, error) {
 		}, nil
 	}
 	if _, ok := robotgo.Keycode[rawConfig]; !ok {
-		log.Printf(errTemplate, fmt.Sprintf("不支持该按键：%s", rawConfig), lineNumber, source)
+		log.Printf(errTemplate, fmt.Sprintf("not supported key: %s", rawConfig), lineNumber, source)
 		return nil, ErrNotSupportKey
 	}
 	return &model.Command{
@@ -224,7 +224,7 @@ func parseCommandTap(lineNumber int, source string) (*model.Command, error) {
 
 func parseCommandSleep(lineNumber int, source string) (*model.Command, error) {
 	if len(source) < 3 {
-		log.Printf(errTemplate, "缺少等号", lineNumber, source)
+		log.Printf(errTemplate, "missed equal = ", lineNumber, source)
 		return nil, ErrNoEqual
 	}
 	duration, err := strconv.Atoi(source[2:])

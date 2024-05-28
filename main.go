@@ -100,7 +100,7 @@ func getCommon(sources []string) (*model.Common, error) {
 				kv[item.Name] = v
 			}
 		}
-		// 通过序列化达到 map => struct 的目的
+		// Convert map to struct
 		data, err := json.Marshal(kv)
 		if err != nil {
 			log.Println("marshal kv failed", err)
@@ -115,7 +115,7 @@ func getCommon(sources []string) (*model.Common, error) {
 	return &common, nil
 }
 
-// 将配置里的值转化为 common 里的对应的值
+// Convert config into config
 func getValueOfConfig(source string, item model.CommonItem) (interface{}, error) {
 	rawValue := source[(len(item.Name) + 1):]
 	switch item.Type {

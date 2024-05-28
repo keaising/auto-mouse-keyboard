@@ -9,12 +9,12 @@ type Command struct {
 type CommandType string
 
 const (
-	CommandTypeMove             CommandType = "move"
-	CommandTypeClick            CommandType = "click"
-	CommandTypeInput            CommandType = "input"
-	CommandTypeTap              CommandType = "tap"
-	CommandTypeSleep            CommandType = "sleep"
-	CommandTypeLoop             CommandType = "loop"
+	CommandTypeMove  CommandType = "move"
+	CommandTypeClick CommandType = "click"
+	CommandTypeInput CommandType = "input"
+	CommandTypeTap   CommandType = "tap"
+	CommandTypeSleep CommandType = "sleep"
+	CommandTypeLoop  CommandType = "loop"
 )
 
 type MoveArgs struct {
@@ -46,8 +46,8 @@ type SleepArgs struct {
 }
 
 type LoopArgs struct {
-	// 循环次数
+	// Loop times
 	Times int
-	// 每次循环的全部命令
+	// All commands in this loop
 	Commands []*Command
 }
